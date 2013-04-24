@@ -8,6 +8,7 @@ Reference=*\G{00025E01-0000-0000-C000-000000000046}#4.0#0#..\..\..\..\Program Fi
 Form=Admin.frm
 Form=temp.frm
 Form=user_panel.frm
+Form=temp_frame.frm
 IconForm="Form1"
 Startup="Form3"
 HelpFile=""
