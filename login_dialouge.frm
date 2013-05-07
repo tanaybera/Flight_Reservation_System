@@ -5,6 +5,7 @@ Begin VB.Form frmLogin
    ClientLeft      =   2835
    ClientTop       =   3480
    ClientWidth     =   3750
+   Icon            =   "login_dialouge.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
@@ -17,7 +18,7 @@ Begin VB.Form frmLogin
       Height          =   345
       Left            =   1290
       TabIndex        =   1
-      Top             =   135
+      Top             =   120
       Width           =   2325
    End
    Begin VB.CommandButton cmdOK 
@@ -89,31 +90,37 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Option Explicit
-
-Public LoginSucceeded As Boolean
+Public conn As ADODB.Connection
+Public rs As ADODB.Recordset
 
 Private Sub cmdCancel_Click()
-    'set the global var to false
-    'to denote a failed login
-    LoginSucceeded = False
     Form1.Enabled = True
     Unload Me
 End Sub
 
 Private Sub cmdOK_Click()
-    'check for correct password
-    If txtPassword = "password" Then
-        'place code to here to pass the
-        'success to the calling sub
-        'setting a global var is the easiest
-        LoginSucceeded = True
-        Me.Hide
-    Else
-        MsgBox "Invalid Password, try again!", , "Login"
-        txtPassword.SetFocus
-        SendKeys "{Home}+{End}"
+    
+    If txtUserName = "" Or txtPassword = "" Then
+    MsgBox "Field Empty. Please Fill Up!"
+    Exit Sub
     End If
+    
+    rs.Source = "SELECT * FROM login WHERE userid='" + txtUserName.Text + "' AND password = '" + txtPassword + "' AND usertype=" + Str(Form1.usertype)
+    rs.Open
+    If rs.RecordCount > 0 Then
+        If Form1.usertype = 1 Then
+        Admin.Show
+        Unload Me
+        ElseIf Form1.usertype = 2 Then
+        Form3.Show
+        Unload Me
+        End If
+        Form1.Hide
+    Else
+        MsgBox "Invalid Credentials, try again!", , "Login"
+        txtPassword.SetFocus
+    End If
+    rs.Close
 End Sub
 
 Private Sub Form_Load()
@@ -123,4 +130,14 @@ End If
 If (Form1.usertype = 2) Then
 Me.Caption = "Operator Login"
 End If
+
+
+Set conn = New ADODB.Connection
+    conn.Open Form1.cs
+Set rs = New ADODB.Recordset
+    rs.ActiveConnection = conn
+    rs.CursorLocation = adUseClient
+    rs.CursorType = adOpenDynamic
+    rs.LockType = adLockOptimistic
 End Sub
+
